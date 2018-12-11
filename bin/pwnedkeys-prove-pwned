@@ -1,0 +1,5 @@
+#!/usr/bin/env ruby
+
+require "pwnedkeys/response"
+
+puts Pwnedkeys::Response.new($stdin.read).to_json

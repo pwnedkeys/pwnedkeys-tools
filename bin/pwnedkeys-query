@@ -1,0 +1,48 @@
+#!/usr/bin/env ruby
+
+require "pwnedkeys/request"
+require "openssl/x509/spki"
+
+def main(data)
+  spki = spki_from_arbitrary_data(data)
+
+  Pwnedkeys::Request.new(spki).pwned? ? 1 : 0
+end
+
+def spki_from_arbitrary_data(data)
+  begin
+    spki_from_key(data)
+  rescue OpenSSL::PKey::PKeyError
+    begin
+      spki_from_cert(data)
+    rescue OpenSSL::X509::CertificateError
+      begin
+        spki_from_csr(data)
+      rescue OpenSSL::X509::RequestError
+        raise ArgumentError, "Unknown input format -- must be an unencrypted key, X.509 certificate, or X.509 CSR in PEM or DER format"
+      end
+    end
+  end
+end
+
+def spki_from_key(data)
+  OpenSSL::PKey.read(data).to_spki
+end
+
+def spki_from_cert(data)
+  OpenSSL::X509::Certificate.new(data).to_spki
+end
+
+def spki_from_csr(data)
+  OpenSSL::X509::Request.new(data).to_spki
+end
+  
+begin
+  exit main($stdin.read)
+rescue => ex
+  $stderr.puts "ERROR: #{ex.message} (#{ex.class})"
+  if ENV["PWNEDKEYS_DEBUG"] && !ENV["PWNEDKEYS_DEBUG"].empty?
+    $stderr.puts ex.backtrace.map { |l| "  #{l}" }.join
+    exit 2
+  end
+end

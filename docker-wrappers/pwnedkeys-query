@@ -1,0 +1,7 @@
+#!/bin/sh
+
+set -e
+
+: ${PWNEDKEYS_TOOLS_DOCKER_IMAGE:=pwnedkeys/tools:latest}
+
+docker run -i --rm "$PWNEDKEYS_TOOLS_DOCKER_IMAGE" pwnedkeys-query "$@"
