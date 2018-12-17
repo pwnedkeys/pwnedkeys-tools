@@ -2,6 +2,7 @@
 
 require "pwnedkeys/request"
 require "openssl/x509/spki"
+require "openssl/pkey"
 
 def main(data)
   spki = spki_from_arbitrary_data(data)
@@ -19,7 +20,11 @@ def spki_from_arbitrary_data(data)
       begin
         spki_from_csr(data)
       rescue OpenSSL::X509::RequestError
-        raise ArgumentError, "Unknown input format -- must be an unencrypted key, X.509 certificate, or X.509 CSR in PEM or DER format"
+        begin
+          spki_from_ssh_key(data)
+        rescue OpenSSL::PKey::PKeyError
+          raise ArgumentError, "Unknown input format -- must be an unencrypted key, X.509 certificate, or X.509 CSR in PEM or DER format, or an OpenSSH public key"
+        end
       end
     end
   end
@@ -35,6 +40,10 @@ end
 
 def spki_from_csr(data)
   OpenSSL::X509::Request.new(data).to_spki
+end
+
+def spki_from_ssh_key(data)
+  OpenSSL::PKey.from_ssh_key(data).to_spki
 end
   
 begin
