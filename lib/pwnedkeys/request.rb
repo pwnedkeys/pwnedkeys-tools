@@ -37,7 +37,11 @@ module Pwnedkeys
         uri = URI(ENV["PWNEDKEYS_API_URL"] || "https://v1.pwnedkeys.com")
         uri.path += "/#{@spki.spki_fingerprint.hexdigest}"
 
-        res = Net::HTTP.get_response(uri)
+        res = Net::HTTP.start(uri.host, uri.port, use_ssl: uri.scheme == "https") do |http|
+          req = Net::HTTP::Get.new(uri.path)
+          req["User-Agent"] = "pwnedkeys-tools/0.0.0"
+          http.request(req)
+        end
 
         if res.code == "200"
           verify!(res.body)
