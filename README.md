@@ -40,8 +40,8 @@ same names and usage.
 
 ## Query for a pwned key
 
-Run `pwnedkeys-query`, passing a public or private key, CSR, or X.509 certificate
-via `stdin`:
+Run `pwnedkeys-query`, passing a public or private key, CSR, X.509 certificate,
+or SSH public key via `stdin`:
 
     pwnedkeys-query < /etc/ssl/certs/ssl-cert-snakeoil.pem
 
