@@ -33,6 +33,8 @@ Gem::Specification.new do |s|
 
   s.required_ruby_version = ">= 2.5.0"
 
+  s.add_runtime_dependency "pwnedkeys-api-client"
+
   s.add_development_dependency 'bundler'
   s.add_development_dependency 'github-release'
   s.add_development_dependency 'git-version-bump'
